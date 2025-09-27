@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@darinfnr</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0EA5E9;
+            --dark-blue: #0284C7;
+            --light-blue: #38BDF8;
+            --accent-blue: #7DD3FC;
+            --black: #0F172A;
+            --dark-gray: #1E293B;
+            --white: #F8FAFC;
+            --glass-white: rgba(248, 250, 252, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow: hidden;
+            background: var(--black);
+            color: var(--white);
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Entry Screen */
+        .entry-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(30px) saturate(150%);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .entry-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(0px);
+        }
+
+        .entry-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+            position: relative;
+            animation: pulse-glow 2s infinite;
+            text-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Background Video Container */
+        .video-background {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%) scale(1.1);
+            z-index: -2;
+            filter: brightness(0.3) saturate(1.5) hue-rotate(200deg);
+        }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(14, 165, 233, 0.1) 0%,
+                rgba(15, 23, 42, 0.8) 50%,
+                rgba(2, 132, 199, 0.1) 100%);
+            z-index: -1;
+            animation: gradient-shift 10s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: filter 0.8s ease;
+        }
+
+        .main-content.blurred {
+            filter: blur(20px) brightness(0.7);
+        }
+
+        /* Glass Card */
+        .social-card {
+            width: 90%;
+            max-width: 450px;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, 
+                rgba(14, 165, 233, 0.1) 0%,
+                rgba(248, 250, 252, 0.05) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(125, 211, 252, 0.2);
+            border-radius: 24px;
+            box-shadow: 
+                0 25px 50px -12px rgba(14, 165, 233, 0.25),
+                0 0 100px rgba(14, 165, 233, 0.1),
+                inset 0 0 30px rgba(125, 211, 252, 0.05);
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Shimmer Effect */
+        .social-card::before {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(125, 211, 252, 0.1) 50%,
+                transparent 70%
+            );
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg) translateX(-100%); }
+            100% { transform: rotate(0deg) translateX(100%); }
+        }
+
+        /* Username */
+        .username {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--white) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(14, 165, 233, 0.5);
+            position: relative;
+            letter-spacing: -0.02em;
+            animation: glow-text 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-text {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        /* Social Link */
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, 
+                rgba(14, 165, 233, 0.2) 0%,
+                rgba(2, 132, 199, 0.3) 100%);
+            border: 1px solid rgba(125, 211, 252, 0.3);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--white);
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .social-link::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(125, 211, 252, 0.4) 0%, transparent 70%);
+            transition: width 0.6s, height 0.6s;
+            transform: translate(-50%, -50%);
+        }
+
+        .social-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 25px rgba(14, 165, 233, 0.3),
+                0 0 50px rgba(14, 165, 233, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        .social-link:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .social-link svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.5rem;
+            fill: currentColor;
+        }
+
+        /* Audio Controls */
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .audio-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(125, 211, 252, 0.3);
+            background: linear-gradient(135deg, 
+                rgba(14, 165, 233, 0.1) 0%,
+                rgba(2, 132, 199, 0.2) 100%);
+            border-radius: 8px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .audio-btn:hover {
+            background: linear-gradient(135deg, 
+                rgba(14, 165, 233, 0.3) 0%,
+                rgba(2, 132, 199, 0.4) 100%);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .volume-slider {
+            width: 120px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(125, 211, 252, 0.2);
+            border-radius: 2px;
+            outline: none;
+            position: relative;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(125, 211, 252, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(125, 211, 252, 0.8);
+        }
+
+        /* Particle Effects */
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle-float 10s infinite linear;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Entry Screen -->
+    <div class="entry-screen" id="entryScreen">
+        <div class="entry-text">Click to enter...</div>
+    </div>
+
+    <!-- Background Video -->
+    <iframe 
+        id="bgVideo"
+        class="video-background"
+        src="https://www.youtube.com/embed/V1RPi2MYptM?autoplay=1&mute=1&controls=0&loop=1&playlist=V1RPi2MYptM&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&fs=0&cc_load_policy=0&autohide=1&playsinline=1"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+    </iframe>
+    <div class="video-overlay"></div>
+
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Main Content -->
+    <div class="main-content blurred" id="mainContent">
+        <div class="social-card">
+            <h1 class="username">darinfnr</h1>
+            
+            <a href="https://x.com/Darinfnr1" target="_blank" class="social-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                @Darinfnr1
+            </a>
+
+            <div class="audio-controls">
+                <button class="audio-btn" id="playBtn">▶</button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30">
+                <button class="audio-btn" id="muteBtn">🔊</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Audio -->
+    <iframe 
+        id="audioFrame"
+        width="0" 
+        height="0" 
+        src="https://www.youtube.com/embed/B41SCssaYOM?enablejsapi=1&autoplay=0"
+        frameborder="0"
+        allow="autoplay">
+    </iframe>
+
+    <script>
+        // Entry screen logic
+        const entryScreen = document.getElementById('entryScreen');
+        const mainContent = document.getElementById('mainContent');
+        const playBtn = document.getElementById('playBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        
+        let isPlaying = false;
+        let isMuted = false;
+        let audioStarted = false;
+
+        // Audio control simulation (YouTube iframe API limitations in this environment)
+        entryScreen.addEventListener('click', function() {
+            entryScreen.classList.add('hidden');
+            mainContent.classList.remove('blurred');
+            
+            // Start audio after entry
+            if (!audioStarted) {
+                // Note: Due to browser autoplay policies, actual audio control would require YouTube API
+                audioStarted = true;
+                isPlaying = true;
+                playBtn.textContent = '⏸';
+            }
+        });
+
+        // Play/Pause button
+        playBtn.addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            playBtn.textContent = isPlaying ? '⏸' : '▶';
+            // In production, this would control the YouTube player
+        });
+
+        // Mute button
+        muteBtn.addEventListener('click', function() {
+            isMuted = !isMuted;
+            muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            if (isMuted) {
+                volumeSlider.value = 0;
+            } else {
+                volumeSlider.value = 30;
+            }
+        });
+
+        // Volume slider
+        volumeSlider.addEventListener('input', function() {
+            if (this.value == 0) {
+                isMuted = true;
+                muteBtn.textContent = '🔇';
+            } else {
+                isMuted = false;
+                muteBtn.textContent = '🔊';
+            }
+        });
+
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Add some interactivity to the card
+        const card = document.querySelector('.social-card');
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const { innerWidth, innerHeight } = window;
+            
+            const xRotation = ((clientY / innerHeight) - 0.5) * 10;
+            const yRotation = ((clientX / innerWidth) - 0.5) * 10;
+            
+            card.style.transform = `perspective(1000px) rotateX(${-xRotation}deg) rotateY(${yRotation}deg)`;
+        });
+    </script>
+</body>
+</html>
